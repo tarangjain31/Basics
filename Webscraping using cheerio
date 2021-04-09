@@ -1,0 +1,27 @@
+const request=require("request");
+const cheerio= require("cheerio");
+const fs= require("fs");
+
+request("https://www.espncricinfo.com/series/women-s-senior-one-day-trophy-2020-21-1255263/jharkhand-women-vs-railways-india-women-final-1255735/full-scorecard",callback);
+
+function callback(err,res,html){
+    if(!err){
+        let maxwickets=0;
+        let playername;
+        fs.writeFileSync("hello3.html",html);
+        let $= cheerio.load(html);
+        let rows= $(".table.bowler tbody tr");
+        console.log(rows.length);
+        for(let i=0;i<rows.length;i++){
+            let columns=$(rows[i]).find("td");
+            //console.log(columns.length);
+            let wickets=parseInt($(columns[4]).text());
+            if(wickets>maxwickets){
+                wickets=maxwickets;
+                playername=$(columns[0]).text();
+            }
+        }
+        console.log(playername);
+    }
+    
+}
