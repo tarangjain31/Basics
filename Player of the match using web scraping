@@ -1,0 +1,14 @@
+const request= require("request");
+const cheerio= require("cheerio");
+const fs= require("fs");
+
+request("https://www.espncricinfo.com/series/sheffield-shield-2020-21-1233442/victoria-vs-south-australia-23rd-match-1251084/full-scorecard",callback);
+
+function callback(err,res,html){
+    if(!err){
+        //fs.writeFileSync("hello1.html",html);
+        let $= cheerio.load(html);
+        let row=$(".best-player-title").text();
+        console.log(row);
+    }
+}
