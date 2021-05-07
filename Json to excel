@@ -1,0 +1,48 @@
+const request=require("request");
+const cheerio= require("cheerio");
+const fs= require("fs");
+const xl = require('excel4node');
+const wb = new xl.Workbook();
+const ws = wb.addWorksheet('Worksheet Name');
+request("https://inshorts.com/en/read",callback)
+let finaldata=[];
+function callback(err,res,html){
+    if(!err){
+        //fs.writeFileSync("b.html",html);
+        let $= cheerio.load(html);
+        let rows= $(".news-card-title.news-right-box");
+        console.log(rows.length);
+        for(let i=0;i<rows.length;i++){
+        let newsline= $(rows[i]).text()
+        let newsurl= "https://inshorts.com/en/read"+$(rows[i]).attr("href");
+        finaldata.push({
+            "News Title": newsline,
+            "News Link" : newsurl
+        })
+        //console.log(finaldata);
+        const headingColumnNames = [
+            "News Name",
+            "News Link",
+        ]
+        
+        //Write Column Title in Excel file
+        let headingColumnIndex = 1;
+        headingColumnNames.forEach(heading => {
+            ws.cell(1, headingColumnIndex++)
+                .string(heading)
+        });
+        
+        //Write Data in Excel file
+        let rowIndex = 2;
+        finaldata.forEach( record => {
+            let columnIndex = 1;
+            Object.keys(record ).forEach(columnName =>{
+                ws.cell(rowIndex,columnIndex++)
+                    .string(record [columnName])
+            });
+            rowIndex++;
+        }); 
+        wb.write('TeacherData2.xlsx');
+    }
+    }
+}
