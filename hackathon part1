@@ -1,0 +1,49 @@
+const puppy= require("puppeteer")
+async function main() {
+    let browser = await puppy.launch({
+        headless: false,
+        defaultViewport: false
+    });
+    let tabs= await browser.pages();
+    let tab= tabs[0];
+    await tab.goto("https://inshorts.com/en/read");
+    let news= await tab.$$(".clickable")
+    console.log(news.length);
+    let newsurl=[]
+    for(let i = 0; i < news.length; i++) {
+        let url = await tab.evaluate(function(ele) {
+            return ele.getAttribute("href");
+        }, news[i]);
+        newsurl.push(url);
+        console.log(newsurl);
+    }
+    for(let i = 3; i < 7; i++) {
+        let fullLink = "https://inshorts.com" + newsurl[i]
+        //await tab.goto("https://inshorts.com" + newsurl[i]);
+        await solve(tab,fullLink);
+    }
+    
+}
+
+async function solve(tab,url){
+    await tab.goto(url);
+    let content= await tab.$$(".news-card-content.news-right-box");
+    console.log(content.length);
+    for(let i=0;i<content.length;i++){
+        let NewsName= await tab.evaluate(function(ele){
+            console.log(ele.innerText);
+            return ele.innerText;
+
+        },content[i]);
+        await tab.keyboard.down("Control");
+        await tab.keyboard.press("A");
+        await tab.keyboard.press("C");
+        await tab.goto("https://www.rapidtables.com/tools/notepad.html");
+        await tab.click("#area")
+        await tab.keyboard.press("A");
+        await tab.keyboard.press("V");
+        await tab.keyboard.up("Control");
+    }
+}
+
+main();
